@@ -127,6 +127,15 @@
   <button class="secondary-btn" id="resetBtn">Reset day</button>
 </div>
 
+<div id="nameModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; z-index:100;">
+  <div class="card" style="width:85%; max-width:360px; text-align:center;">
+    <p style="font-size:18px; font-weight:600; margin:0 0 8px;">Welcome!</p>
+    <p style="font-size:14px; color: var(--text-secondary); margin:0 0 16px;">What should we call you?</p>
+    <input type="text" id="nameInput" placeholder="Your name" style="width:100%; font-size:18px; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:12px;">
+    <button id="saveNameBtn" style="width:100%;">Continue</button>
+  </div>
+</div>
+
 <script>
 const RATE = 0.38;
 const MIN_WORK = 300;
@@ -184,14 +193,16 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 load();
 render();
 
-const USER_NAME = 'Noah';
+const NAME_KEY = 'commissionAppUserName';
+let USER_NAME = localStorage.getItem(NAME_KEY) || '';
+
 function updateHeader() {
   const now = new Date();
   const hour = now.getHours();
   let greet = 'Good morning';
   if (hour >= 12 && hour < 17) greet = 'Good afternoon';
   else if (hour >= 17) greet = 'Good evening';
-  document.getElementById('greeting').textContent = greet + ', ' + USER_NAME;
+  document.getElementById('greeting').textContent = greet + (USER_NAME ? ', ' + USER_NAME : '');
 
   const dateStr = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
   const timeStr = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -199,6 +210,27 @@ function updateHeader() {
 }
 updateHeader();
 setInterval(updateHeader, 1000);
+
+const nameModal = document.getElementById('nameModal');
+const nameInput = document.getElementById('nameInput');
+
+if (!USER_NAME) {
+  nameModal.style.display = 'flex';
+}
+
+function saveName() {
+  const val = nameInput.value.trim();
+  if (!val) return;
+  USER_NAME = val;
+  localStorage.setItem(NAME_KEY, USER_NAME);
+  nameModal.style.display = 'none';
+  updateHeader();
+}
+
+document.getElementById('saveNameBtn').addEventListener('click', saveName);
+nameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') saveName();
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
