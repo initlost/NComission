@@ -97,7 +97,10 @@
 </head>
 <body>
 <div class="container">
-  <h1>Commission Calculator</h1>
+  <div style="text-align:center; margin-bottom: 20px;">
+    <p style="font-size:22px; font-weight:600; margin:0 0 4px;" id="greeting">Hello</p>
+    <p style="font-size:15px; color: var(--text-secondary); margin:0;" id="datetime">—</p>
+  </div>
 
   <div class="input-row">
     <input type="number" id="jobAmount" placeholder="Job amount ($)" inputmode="decimal">
@@ -180,6 +183,22 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 load();
 render();
+
+const USER_NAME = 'Noah';
+function updateHeader() {
+  const now = new Date();
+  const hour = now.getHours();
+  let greet = 'Good morning';
+  if (hour >= 12 && hour < 17) greet = 'Good afternoon';
+  else if (hour >= 17) greet = 'Good evening';
+  document.getElementById('greeting').textContent = greet + ', ' + USER_NAME;
+
+  const dateStr = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const timeStr = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  document.getElementById('datetime').textContent = dateStr + ' · ' + timeStr;
+}
+updateHeader();
+setInterval(updateHeader, 1000);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
